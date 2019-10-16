@@ -1,81 +1,6 @@
 import random
 from string import ascii_uppercase
-
-class BotPiece(object):
-    def __init__(self, name, length):
-        self.length = length
-        self.name = name
-        self.pips = [False] * length
-
-        self.horiz = None
-        self.x_min, self.x_max = None, None
-        self.y_min, self.y_max = None, None
-
-    def set_piece(self, x, y, horiz):
-        self.horiz = horiz
-        self.x_min = x
-        self.y_min = y
-        if horiz:
-            self.x_max = x + self.length
-            self.y_max = y
-        else:
-            self.x_max = x
-            self.y_max = y + self.length
-
-    def check_ship(self, x, y):
-        x_check = self.x <= x <= self.x + length * (not self.horiz)
-        y_check = self.y <= y <= self.y + length * self.horiz
-        if x_check and y_check:
-            self.pips[(x - self.x) + (y - self.y)] = True
-            return True
-        else:
-            return False
-
-    @property
-    def is_sunk(self):
-        return all(self.pips)
-
-    def __repr__(self):
-        return f'{self.name} - {self.length}'
-
-class Board(object):
-    '''
-    Your board containing your ships
-    Contains the following characters:
-        "-" (0) - empty space, unguessed
-        "o" (1) - empty space, guessed
-        "S" (2) - ship, unhit
-        "X" (3) - ship, hit
-    '''
-    def __init__(self):
-        self.grid = [[0 for _ in range(10)] for _ in range(10)]
-
-    def check_placeable(self, piece, x, y, horiz):
-        # check if it has room, if so, modify the values of grid
-        for i in range(piece.length):
-            # protects against trying to go past the edge
-            try:
-                if self.grid[x + i * (not horiz)][y + i * horiz] != 0:
-                    return False
-            except IndexError:
-                return False
-        piece.set_piece(x, y, horiz)
-        for i in range(piece.length):
-            self.grid[x + i * (not horiz)][y + i * horiz] = 2 
-        return True
-
-    @property
-    def open(self):
-        enum = {0: '-', 1: 'o', 2: 'S', 3: 'X'}
-        out_str = '  ' + ' '.join([str(x) for x in range(10)]) + '\n'
-        return out_str + '\n'.join([f'{ascii_uppercase[i]} ' + ' '.join([enum[val] for val in row]) for i, row in enumerate(self.grid)])
-
-    @property
-    def hidden(self):
-        enum = {0: '-', 1: 'o', 2: '-', 3: 'X'}
-        out_str = '  ' + ' '.join([str(x) for x in range(10)]) + '\n'
-        return out_str + '\n'.join([f'{ascii_uppercase[i]} ' + ' '.join([enum[val] for val in row]) for i, row in enumerate(self.grid)])
-
+from battlestuff import Board, Piece
 
 class BattleshipBot(object):
     def __init__(self):
@@ -100,7 +25,7 @@ class BattleshipBot(object):
             ('Submarine', 3),
             ('Patrol Boat', 2),
             ]
-        return [BotPiece(name, length) for name, length in piece_cfg]
+        return [Piece(name, length) for name, length in piece_cfg]
 
     def try_place(self, piece):
         all_combos = [(x, y, horiz) for x in range(10) for y in range(10) for horiz in (True, False)]
@@ -109,6 +34,33 @@ class BattleshipBot(object):
             placed = self.board.check_placeable(piece, x, y, horiz)
             if placed:
                 return True
+
+    def guess_coords(self, board):
+        all_combos = [(x, y) for x in range(10) for y in range(10)]
+        random.shuffle(all_combos)
+        for x, y in all_combos:
+            valid = board.is_guessable(x, y)
+            if valid:
+                print(f'Bot guesses {ascii_uppercase[x]}, {y}')
+                return x, y
+        raise Exception('Somehow you have no guesses')
+
+    def check_hit(self, x, y):
+        for piece in self.pieces:
+            is_hit = piece.check_hit(x, y)
+            if not is_hit:
+                continue
+            piece.apply_hit(x, y)
+            if piece.is_sunk:
+                print(f'Bot {piece.name} has been sunk')
+            else:
+                print(f'Bot has been hit')
+            return True
+        print('The shot missed')
+        return False
+
+    def update_board(self, x, y, hit):
+        self.board.update(x, y, hit)
 
     @property
     def open_board(self):
