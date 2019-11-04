@@ -5,8 +5,7 @@ class Piece(object):
     def __init__(self, name, length):
         self.length = length
         self.name = name
-        self.pips = [False] * length
-
+        self.pips = 0
         self.horiz = None
         self.x_min, self.x_max = None, None
         self.y_min, self.y_max = None, None
@@ -15,24 +14,46 @@ class Piece(object):
         '''
         Sets the positional values for the piece
         '''
-        # TODO: Fill in the missing positional values (10 - 12)
-        pass
+        if horiz:
+            self.x_min = x
+            self.x_max = x + self.length - 1 
+            self.y_min = y
+            self.y_max = self.y_min
+        else:
+            self.y_min = y
+            self.y_max = y + self.length - 1
+            self.x_min = x
+            self.x_max = self.x_min
 
     def check_hit(self, x, y):
         '''
         Given a set of coordinates, check if it hit the piece
         return a boolean value of if it hit
         '''
-        # TODO: Return True/False depending on whether it hit
-        pass
+        return self.x_min <= x <= self.x_max and self.y_min <= y <= self.y_max
+        # if self.horiz:
+        #     for i in range(self.y_min, self.y_max):
+        #         if i == y:
+        #             return True
+        # elif not self.horiz:
+        #     for i in range(self.x_min, self.x_max):
+        #         if i == x:
+        #             return True
+        # else:
+        #     return False
 
-    def apply_hit(self, x, y):
+
+    def apply_hit(self, x, y):  
         '''
         Modifies the appropriate index in pips with True
         returns None
         '''
         # TODO: modify self.pips in the correct location
-        pass
+        # TODO: sync the hit between the x,y and the pip location
+        # for i in self.pips:
+        #     if self.pips[i] == False:
+        #         self.pips[i] = True
+        self.pips += 1
 
     @property
     def is_sunk(self):
@@ -40,11 +61,13 @@ class Piece(object):
         A property that checks if all the pips are hit
         '''
         # TODO: return if all values in self.pips are true
-        pass
+        return self.pips == self.length
 
     def __repr__(self):
         # TODO: Modify how you want the pieces to appear
-        pass
+        # TODO: print statement(f string with attributes)
+        return (f'{self.name}, Length:{self.length}')
+        
 
 class Board(object):
     '''
@@ -61,17 +84,34 @@ class Board(object):
     def check_placeable(self, piece, x, y, horiz):
         '''
         Check if the piece is placeable on the given board
-        Returns True if the peice was successfully placed
+        Returns True if the piece was successfully placed
         '''
+        # this part is check to make sure the board has enough space to place the pieces
+        if horiz:
+            if y + piece.length > 10:
+                print('Cannot place there, not enough space')
+                return False
+        else:
+            if x + piece.length > 10:
+                print('Cannot place there, not enough space')
+                return False
+
         for i in range(piece.length):
-            # TODO: check that all spaces the piece would occupy are free
-            # if not, return False
-            pass
-        # we assume the piece is placeable, so we set the values
+            if horiz:
+                if self.grid[x][y + 1] != 0:
+                    return False
+            else:
+                if self.grid[x + 1][y] != 0:
+                    return False
+        
         piece.set_piece(x, y, horiz)
+
         for i in range(piece.length):
             # TODO: modify self.grid so that it has the correct value
-            pass
+            if piece.horiz:
+                self.grid[x][y + i] = 2
+            else:
+                self.grid[x + i][y] = 2
         return True
 
     def is_guessable(self, x, y):
@@ -79,14 +119,19 @@ class Board(object):
         Returns whether or not the x/y is a valid guess (not already guessed)
         '''
         # TODO: Fill out
-        pass
+        #  (a == 1 or a == 2) is the same as (a in [1,2])
+        return self.grid[x][y] in [0, 2]
 
     def update(self, x, y, hit):
         '''
         Updates the grid value depending on whether or not it was a hit
         '''
-        # TODO: Fill out
-        pass
+        # TODO: Fill out, just calls the other one
+        # if hit:
+        #     self.grid[x][y] = 3
+        # else:
+        #     self.grid[x][y] = 1
+        self.grid[x][y] = 3 if hit else 1
 
     @property
     def open(self):
@@ -100,7 +145,6 @@ class Board(object):
         out_str = '  ' + ' '.join([str(x) for x in range(10)]) + '\n'
         return out_str + '\n'.join([f'{ascii_uppercase[i]} ' + ' '.join([enum[val] for val in row]) for i, row in enumerate(self.grid)])
 
-
 class Player(object):
     def __init__(self):
         self.board = Board()
@@ -111,21 +155,56 @@ class Player(object):
         Create a instance of piece for each of the 5 ships
         returns a list of pieces with names/lengths (but not placed)
         '''
-        # TODO: Create 5 pieces with names/lengths and return a list
-        pass
+        piece_cfg = [
+            ('Carrier', 5),
+            ('Battleship', 4),
+            ('Destroyer', 3),
+            ('Submarine', 3),
+            ('Patrol Boat', 2),
+            ]
+        
+        # if you see an easy loop, it can be turned into a list comp
+        # easy means one line or so
+        # ship_list = []
+        # for name, length in piece_cfg:
+        #     ship_list.append(Piece(name, length))
+
+        return [Piece(name, length) for name, length in piece_cfg] 
+          
+        # destroyer = Piece('Destroyer', 2)
+        # submarine = Piece('Submarine', 3)
+        # cruiser = Piece('Cruiser', 3)
+        # battleship = Piece('Battleship', 4)
+        # carrier = Piece('Carrier', 5)
+        # ship_list.append(destroyer)
+        # ship_list.append(submarine)
+        # ship_list.append(cruiser)
+        # ship_list.append(battleship)
+        # ship_list.append(carrier)
+        # return ship_list
 
     def place_pieces(self):
         '''
         Manually place pieces via prompt
-        '''
+        ''' 
         for piece in self.pieces:
             # TODO: Show the current piece info and board
             # TODO: Until the user puts in a valid location, do the following:
-            #   Prompt the user for x/y and whether the piece should be horizontal
+            #   SafePrompt the user for x/y and whether the piece should be horizontal
             #   Check the board to see if it's a placeable location
             #   If it is, go to the next piece
-            pass
+            # while true until they find a valid location for the next piece
+            while True:
+                print(self.open_board)
+                print(f'Where would you like to place your {piece}?')
+                x, y = self.safe_prompt()
+                horiz = input('Would you like this ship to be horizontal?(y/n)') == 'y'
+                self.board.check_placeable(piece, x, y, horiz)
+                # TODO: has a piece been successfully been placed?
+                break
         # TODO: display the final player board
+        print(self.open_board)
+        print('This is your final board')
         return
 
     def safe_prompt(self):
@@ -135,7 +214,14 @@ class Player(object):
         Correctly coerce the inputs to integers and return those x/y integers
         '''
         # TODO: read/coerce an x/y input
-        pass
+        while True:
+            prompt = input(f'Please input coordinates. (Use a-k(lowercase only), and 0-9)')
+            real_x = int(ascii_lowercase.index(prompt[0]))
+            real_y = int(prompt[1])
+            if self.board.is_guessable(real_x, real_y):
+                return real_x, real_y
+            else:
+                break
 
     def auto_place(self):
         '''
@@ -170,15 +256,25 @@ class Player(object):
         returns True if any of the pieces were hit, otherwise False
         '''
         # TODO: Fill out
-        pass
+        for piece in self.pieces:
+            is_hit = piece.check_hit(x, y)
+            # TODO: will never make it past first piece
+            # TODO: update board goes somwhere in here
+            if is_hit:
+                print(f'Hit! The enemy\'s {piece.name} was hit!')
+                piece.apply_hit(x, y)
+                if piece.is_sunk():
+                    print(f'You sunk the enemy\'s {piece.name}!')
+                return True
+            else: 
+                return False
 
     def update_board(self, x, y, hit):
         '''
         Updates the player board with an x/y and whether it was a hit
         '''
-        # TODO: Fill out
-        pass
-
+        self.board.update(x, y, hit)
+        
     @property
     def open_board(self):
         return self.board.open
@@ -192,5 +288,4 @@ class Player(object):
         '''
         Returns if all the pieces are sunk
         '''
-        # TODO Fill out
-        pass
+        return all([piece.is_sunk for piece in self.pieces])
