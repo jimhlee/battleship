@@ -98,10 +98,10 @@ class Board(object):
 
         for i in range(piece.length):
             if horiz:
-                if self.grid[x][y + 1] != 0:
+                if self.grid[x][y + i] != 0:
                     return False
             else:
-                if self.grid[x + 1][y] != 0:
+                if self.grid[x + i][y] != 0:
                     return False
         
         piece.set_piece(x, y, horiz)
@@ -111,6 +111,8 @@ class Board(object):
             if piece.horiz:
                 self.grid[x][y + i] = 2
             else:
+                print(x)
+                print(y)
                 self.grid[x + i][y] = 2
         return True
 
@@ -199,9 +201,10 @@ class Player(object):
                 print(f'Where would you like to place your {piece}?')
                 x, y = self.safe_prompt()
                 horiz = input('Would you like this ship to be horizontal?(y/n)') == 'y'
-                self.board.check_placeable(piece, x, y, horiz)
+                if self.board.check_placeable(piece, x, y, horiz) == False:
+                    return
                 # TODO: has a piece been successfully been placed?
-                break
+                
         # TODO: display the final player board
         print(self.open_board)
         print('This is your final board')
@@ -218,10 +221,7 @@ class Player(object):
             prompt = input(f'Please input coordinates. (Use a-k(lowercase only), and 0-9)')
             real_x = int(ascii_lowercase.index(prompt[0]))
             real_y = int(prompt[1])
-            if self.board.is_guessable(real_x, real_y):
-                return real_x, real_y
-            else:
-                break
+            return real_x, real_y
 
     def auto_place(self):
         '''
