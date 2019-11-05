@@ -23,9 +23,6 @@ class BattleshipGame(object):
                 self.player_turn()
                 self.bot_turn()
 
-        
-        
-
     def setup_boards(self, auto=False):
         '''
         Sets up the player and bot boards
@@ -45,10 +42,10 @@ class BattleshipGame(object):
         # TODO: check if the player hit the bot's board
         # TODO: Update both boards with the result
 
-        hit = self.player.check_hit(self.player.safe_prompt())
-        if hit:
-            self.player.update_board()
-            self.bot.update_board()
+        x, y = self.player.safe_prompt()
+        hit = self.player.check_hit(x, y)
+        self.player.update_board(x, y, hit)
+        self.bot.update_board(x, y, hit)
 
     def bot_turn(self):
         print(f'\nBot turn, your board is:\n\n{self.player.open_board}')
@@ -56,9 +53,8 @@ class BattleshipGame(object):
         # TODO: check if the bot hit the player's board
         # TODO: Update both boards with the result
         hit = self.bot.check_hit()  
-        if hit:     
-            self.player.update_board()
-            self.bot.update_board()
+        self.player.update_board()
+        self.bot.update_board()
         '''
         if hit:
             player.board[x][y] = 

@@ -14,15 +14,14 @@ class Piece(object):
         '''
         Sets the positional values for the piece
         '''
+        self.horiz = horiz
+        self.y_min = y
+        self.x_min = x
         if horiz:
-            self.x_min = x
             self.x_max = x + self.length - 1 
-            self.y_min = y
             self.y_max = self.y_min
         else:
-            self.y_min = y
             self.y_max = y + self.length - 1
-            self.x_min = x
             self.x_max = self.x_min
 
     def check_hit(self, x, y):
@@ -111,8 +110,6 @@ class Board(object):
             if piece.horiz:
                 self.grid[x][y + i] = 2
             else:
-                print(x)
-                print(y)
                 self.grid[x + i][y] = 2
         return True
 
@@ -201,8 +198,9 @@ class Player(object):
                 print(f'Where would you like to place your {piece}?')
                 x, y = self.safe_prompt()
                 horiz = input('Would you like this ship to be horizontal?(y/n)') == 'y'
-                if self.board.check_placeable(piece, x, y, horiz) == False:
-                    return
+                if self.board.check_placeable(piece, x, y, horiz):
+                    break
+                print('This aint it chief. Try again')
                 # TODO: has a piece been successfully been placed?
                 
         # TODO: display the final player board
