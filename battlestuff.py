@@ -259,12 +259,13 @@ class Player(object):
             # TODO: will never make it past first piece
             # TODO: update board goes somwhere in here
             if is_hit:
-                print(f'Hit! The enemy\'s {piece.name} was hit!')
+                print(f'Hit! A {piece.name} was damaged!')
                 piece.apply_hit(x, y)
                 if piece.is_sunk():
-                    print(f'You sunk the enemy\'s {piece.name}!')
+                    print(f'A {piece.name} was sunk!')
                 return True
             else: 
+                print('The shot missed')
                 return False
 
     def update_board(self, x, y, hit):

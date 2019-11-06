@@ -13,7 +13,7 @@ class BattleshipGame(object):
         # TODO: Call setup functions
         # TODO: Check game state
         # TODO: Let the player/bot take turns
-        self.setup_boards()
+        self.setup_boards(auto)
         while True:
             if self.player.all_sunk:
                 print('You\'ve lost.')
@@ -41,20 +41,19 @@ class BattleshipGame(object):
         # TODO: Ask player for coordinates
         # TODO: check if the player hit the bot's board
         # TODO: Update both boards with the result
-
+        print(f'\nThe bot\'s board looks like this:\n\n{self.bot.hidden_board}')
         x, y = self.player.safe_prompt()
-        hit = self.player.check_hit(x, y)
-        self.player.update_board(x, y, hit)
+        hit = self.bot.check_hit(x, y)
         self.bot.update_board(x, y, hit)
+
 
     def bot_turn(self):
         print(f'\nBot turn, your board is:\n\n{self.player.open_board}')
         x, y = self.bot.guess_coords(self.player.board)
         # TODO: check if the bot hit the player's board
         # TODO: Update both boards with the result
-        hit = self.bot.check_hit()  
-        self.player.update_board()
-        self.bot.update_board()
+        hit = self.player.check_hit(x, y)
+        self.player.update_board(x, y, hit)
         '''
         if hit:
             player.board[x][y] = 
