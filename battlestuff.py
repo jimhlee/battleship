@@ -57,10 +57,27 @@ class Piece(object):
     @property
     def is_sunk(self):
         '''
-        This isn't working. 'bool object isn't callable'
+            This isn't working. 'bool object isn't callable'
         '''
         # TODO: return if all values in self.pips are true
         return self.pips == self.length
+
+    # def sunk(self, x, y, horiz):
+    #     self.horiz = horiz
+    #     self.y_min = y
+    #     self.x_min = x
+    #     if horiz:
+    #         self.x_max = x + self.length - 1 
+    #         self.y_max = self.y_min
+    #     else:
+    #         self.y_max = y + self.length - 1
+    #         self.x_max = self.x_min
+    #     for i in range(self.length):
+    #         if horiz:
+    #             self.grid[x][y + i] != self.name[0].upper
+    #         else:
+    #             if self.grid[x + i][y] != 0:
+    #                 return False 
 
     def __repr__(self):
         # TODO: Modify how you want the pieces to appear
@@ -129,6 +146,7 @@ class Board(object):
         #     self.grid[x][y] = 3
         # else:
         #     self.grid[x][y] = 1
+        print(f'this is x, y, and hit in board.update: {x}, {y}, {hit}')
         self.grid[x][y] = 3 if hit else 1
 
     @property
@@ -250,19 +268,17 @@ class Player(object):
             if is_hit:
                 print(f'Hit! A {piece.name} was damaged!')
                 piece.apply_hit(x, y)
-                if piece.is_sunk:
-                    print(f'A {piece.name} was sunk!')
+                # if piece.is_sunk:
+                    # piece.sunk()
                 return True
-            else: 
+            else:
                 print('The shot missed')
                 return False
 
     def update_board(self, x, y, hit):
-        '''
-        Updates the player board with an x/y and whether it was a hit
-        '''
+        print(f'this is x, y, and hit in update_board: {x}, {y}, {hit}')
         self.board.update(x, y, hit)
-        
+
     @property
     def open_board(self):
         return self.board.open
@@ -273,7 +289,4 @@ class Player(object):
 
     @property
     def all_sunk(self):
-        '''
-        Returns if all the pieces are sunk
-        '''
         return all([piece.is_sunk for piece in self.pieces])
