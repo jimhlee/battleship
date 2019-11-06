@@ -57,7 +57,7 @@ class Piece(object):
     @property
     def is_sunk(self):
         '''
-        A property that checks if all the pips are hit
+        This isn't working. 'bool object isn't callable'
         '''
         # TODO: return if all values in self.pips are true
         return self.pips == self.length
@@ -67,7 +67,6 @@ class Piece(object):
         # TODO: print statement(f string with attributes)
         return (f'{self.name}, Length:{self.length}')
         
-
 class Board(object):
     '''
     Your board containing your ships
@@ -246,22 +245,12 @@ class Player(object):
                 return True
 
     def check_hit(self, x, y):
-        '''
-        Given a set of x/y coordinates, checks each piece to see if it was hit
-        If there was a hit, does two things: 
-            modifies the piece to show that there's a hit
-            checks if it was just a normal hit, or if the whole shit was sunk, and reports the appropraite message
-        returns True if any of the pieces were hit, otherwise False
-        '''
-        # TODO: Fill out
         for piece in self.pieces:
             is_hit = piece.check_hit(x, y)
-            # TODO: will never make it past first piece
-            # TODO: update board goes somwhere in here
             if is_hit:
                 print(f'Hit! A {piece.name} was damaged!')
                 piece.apply_hit(x, y)
-                if piece.is_sunk():
+                if piece.is_sunk:
                     print(f'A {piece.name} was sunk!')
                 return True
             else: 
