@@ -9,26 +9,32 @@ class Piece(object):
         self.horiz = None
         self.x_min, self.x_max = None, None
         self.y_min, self.y_max = None, None
+    
+    @property
+    def coords(self):
+        return { 
+            'x_min': self.x_min,
+            'x_max': self.x_max,
+            'y_min': self.y_min,
+            'y_max': self.y_max
+        }
 
     def set_piece(self, x, y, horiz):
         '''
         Sets the positional values for the piece
         '''
         self.horiz = horiz
-        self.y_min = y
         self.x_min = x
+        self.y_min = y
         if horiz:
-            self.x_max = x + self.length - 1 
-            self.y_max = self.y_min
-        else:
             self.y_max = y + self.length - 1
             self.x_max = self.x_min
 
+        else:
+            self.x_max = x + self.length - 1 
+            self.y_max = self.y_min
+
     def check_hit(self, x, y):
-        '''
-        Given a set of coordinates, check if it hit the piece
-        return a boolean value of if it hit
-        '''
         return self.x_min <= x <= self.x_max and self.y_min <= y <= self.y_max
         # if self.horiz:
         #     for i in range(self.y_min, self.y_max):
@@ -271,10 +277,9 @@ class Player(object):
                 # if piece.is_sunk:
                     # piece.sunk()
                 return True
-            else:
-                print('The shot missed')
-                return False
-
+        print('The shot missed')
+        return False
+                
     def update_board(self, x, y, hit):
         print(f'this is x, y, and hit in update_board: {x}, {y}, {hit}')
         self.board.update(x, y, hit)

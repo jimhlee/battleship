@@ -1,4 +1,4 @@
-def balls():
+def truff():
     output = []
     for i in range(10):
         output.append(i)
