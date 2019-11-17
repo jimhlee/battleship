@@ -6,6 +6,7 @@ class BattleshipBot(object):
     def __init__(self):
         self.board = Board()
         self.pieces = None
+        self.last_hit = []
 
     def place_pieces(self):
         print(f'Bot is creating pieces')
@@ -46,11 +47,19 @@ class BattleshipBot(object):
         raise Exception('Somehow you have no guesses')
 
     def check_hit(self, x, y):
+        smart_x = range(x-1, x+2)
+        smart_y = range(y-1, y+2)
+        smart_range = [random.choice(smart_x), random.choice(smart_y)]
         for piece in self.pieces:
             is_hit = piece.check_hit(x, y)
+            if self.last_hit:
+                random.choice(smart_range)
+                pass
             if not is_hit:
+                self.last_hit = []
                 continue
             piece.apply_hit(x, y)
+            self.last_hit = True
             if piece.is_sunk:
                 print(f'Bot {piece.name} has been sunk')
             else:
