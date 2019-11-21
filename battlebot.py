@@ -6,7 +6,7 @@ class BattleshipBot(object):
     def __init__(self):
         self.board = Board()
         self.pieces = None
-        self.last_hit = None
+        # self.last_hit = None
         self.fancy_set = set()
 
     def place_pieces(self):
@@ -39,31 +39,35 @@ class BattleshipBot(object):
 
     def guess_coords(self, board):
         if self.fancy_set:
-            return self.smart_guess(self.fancy_set)
-        if self.last_hit:
-            return self.smart_guess(board)
+            return self.smart_guess(board, self.fancy_set)
+        # if self.last_hit:
+        #     return self.smart_guess(board, self.fancy_set)
         all_combos = [(x, y) for x in range(10) for y in range(10)]
         random.shuffle(all_combos)
         for x, y in all_combos:
             valid = board.is_guessable(x, y)
             if valid:
                 print(f'Bot guesses {ascii_uppercase[x]}, {y}')
+                # self.last_hit = x, y
+                self.add_coords(x, y)
                 return x, y
         raise Exception('Somehow you have no guesses')
 
-    def smart_guess(self, board):
-        x, y = self.last_hit
+    def add_coords(self, x, y):
         deltas = [(0,1),(0,-1),(1,0),(-1,0)]
         smart_range = {(x+i, y+j) for (i, j) in deltas}
         random.shuffle(smart_range)
         self.fancy_set += smart_range
-        for a, b in self.fancy_set:
-            valid = board.is_guessable(a, b)
+
+    def smart_guess(self, board, fancy):
+        # x, y = self.last_hit
+        for x, y in self.fancy_set:
+            valid = board.is_guessable(x, y)
             if valid:
-                self.fancy_set.remove(a, b)
-                # can i remove the elements from the set here before returning?
-                # i don't think so, need them to carry over
-                return a, b
+                print(f'Bot smartly guesses {ascii_uppercase[x]}, {y}')      
+                self.fancy_set.remove(x, y)
+                self.add_coords(x, y)
+                return x, y
 
 
     def check_hit(self, x, y):
