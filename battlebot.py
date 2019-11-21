@@ -6,7 +6,8 @@ class BattleshipBot(object):
     def __init__(self):
         self.board = Board()
         self.pieces = None
-        self.last_hit = []
+        self.last_hit = None
+        self.fancy_set = set()
 
     def place_pieces(self):
         print(f'Bot is creating pieces')
@@ -37,6 +38,10 @@ class BattleshipBot(object):
                 return True
 
     def guess_coords(self, board):
+        if self.fancy_set:
+            return self.smart_guess(self.fancy_set)
+        if self.last_hit:
+            return self.smart_guess(board)
         all_combos = [(x, y) for x in range(10) for y in range(10)]
         random.shuffle(all_combos)
         for x, y in all_combos:
@@ -46,26 +51,36 @@ class BattleshipBot(object):
                 return x, y
         raise Exception('Somehow you have no guesses')
 
+    def smart_guess(self, board):
+        x, y = self.last_hit
+        deltas = [(0,1),(0,-1),(1,0),(-1,0)]
+        smart_range = {(x+i, y+j) for (i, j) in deltas}
+        random.shuffle(smart_range)
+        self.fancy_set += smart_range
+        for a, b in self.fancy_set:
+            valid = board.is_guessable(a, b)
+            if valid:
+                self.fancy_set.remove(a, b)
+                # can i remove the elements from the set here before returning?
+                # i don't think so, need them to carry over
+                return a, b
+
+
     def check_hit(self, x, y):
-        smart_x = range(x-1, x+2)
-        smart_y = range(y-1, y+2)
-        smart_range = [random.choice(smart_x), random.choice(smart_y)]
         for piece in self.pieces:
             is_hit = piece.check_hit(x, y)
-            if self.last_hit:
-                random.choice(smart_range)
-                pass
             if not is_hit:
-                self.last_hit = []
                 continue
             piece.apply_hit(x, y)
             self.last_hit = True
+            self.hit_coords = (x,y)
             if piece.is_sunk:
                 print(f'Bot {piece.name} has been sunk')
             else:
                 print(f'Bot has been hit')
             return True
         print('The shot missed')
+        self.last_hit = None
         return False
 
     def update_board(self, x, y, hit):
@@ -90,3 +105,6 @@ if __name__ == '__main__':
     print(bbot.open_board)
     print('\n\n')
     print(bbot.hidden_board)
+
+# TODO: each time there's a hit, create a new SET(new term) and then select coords
+# from that set until that set is completely gone. 
