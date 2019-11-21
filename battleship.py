@@ -34,6 +34,8 @@ class BattleshipGame(object):
         print(f'\nBot turn, your board is:\n\n{self.player.open_board}')
         x, y = self.bot.guess_coords(self.player.board)
         hit = self.player.check_hit(x, y)
+        if hit:
+            self.bot.add_coords(x, y)
         self.player.update_board(x, y, hit)
 
 if __name__ == '__main__':

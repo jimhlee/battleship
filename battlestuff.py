@@ -152,7 +152,6 @@ class Board(object):
         #     self.grid[x][y] = 3
         # else:
         #     self.grid[x][y] = 1
-        print(f'this is x, y, and hit in board.update: {x}, {y}, {hit}')
         self.grid[x][y] = 3 if hit else 1
 
     @property
@@ -281,7 +280,6 @@ class Player(object):
         return False
                 
     def update_board(self, x, y, hit):
-        print(f'this is x, y, and hit in update_board: {x}, {y}, {hit}')
         self.board.update(x, y, hit)
 
     @property
