@@ -53,15 +53,24 @@ class BattleshipBot(object):
         smart_list = [(x+i, y+j) for (i, j) in deltas]
         random.shuffle(smart_list)
         smart_set = set(smart_list)
-        self.fancy_set.update(smart_set)
-        print(f' This is {self.fancy_set}')
+        for thing in smart_set:
+            if thing[0] < 0:
+                continue
+            elif thing[0] > 9:
+                continue
+            elif thing[1] < 0:
+                continue
+            elif thing[1] > 9:
+                continue
+            else:
+                self.fancy_set.add(thing)
 
     def smart_guess(self, board):
-        # seems like the problem may be here, where we're taking elements from a set of tuples
+        # TODO: maybe reset the fancy_set if a piece is sunk?
+        # could malfunction if there's two or more pieces next to one another
         for x, y in self.fancy_set:
             valid = board.is_guessable(x, y)
             if valid:
-                print(f'This is fancy_set{self.fancy_set}')
                 print(f'Bot smartly guesses {ascii_uppercase[x]}, {y}') 
                 self.fancy_set.remove((x, y))
                 return x, y
